@@ -2,7 +2,7 @@
 
 conda create -n cs224n_dfp python=3.8
 conda activate cs224n_dfp
-
+pip install --upgrade pip
 conda install pytorch==1.8.0 torchvision torchaudio cudatoolkit=10.1 -c pytorch
 pip install tqdm==4.58.0
 pip install requests==2.25.1
