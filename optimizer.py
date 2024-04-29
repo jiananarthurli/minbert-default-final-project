@@ -32,7 +32,7 @@ class AdamW(Optimizer):
             loss = closure()
 
         for group in self.param_groups:
-            for p in group["params"]:
+            for p in group["params"]: # this is, for example, the entire linear layer's param
                 if p.grad is None:
                     continue
                 grad = p.grad.data
@@ -59,7 +59,24 @@ class AdamW(Optimizer):
                 #    (incorporating the learning rate again).
 
                 ### TODO
-                raise NotImplementedError
-
+                # raise NotImplementedError
+                if "t" not in state:
+                    state["t"] = 0
+                if "m_t" not in state:
+                    state["m_t"] = torch.zeros(p.data.shape)
+                if "v_t" not in state:
+                    state["v_t"] = torch.zeros(p.data.shape)
+                if "m_t_hat" not in state:
+                    state["m_t_hat"] = torch.zeros(p.data.shape)
+                if "v_t_hat" not in state:
+                    state["v_t_hat"] = torch.zeros(p.data.shape)
+                state["t"] += 1
+                state["m_t"] = group["betas"][0] * state["m_t"] + (1 - group["betas"][0]) * grad
+                state["v_t"] = group["betas"][1] * state["v_t"] + (1 - group["betas"][1]) * torch.pow(grad, 2)
+                # alpha_t = alpha * (math.sqrt(1 - group["betas"][1] ** state["t"]) / (1 - group["betas"][0] ** state["t"]))
+                # p.data = p.data - alpha_t * state["m_t"] / (torch.sqrt(state["v_t"]) + group["eps"]) - group["weight_decay"] * p.data
+                state["m_t_hat"] = state["m_t"] / (1 - group["betas"][0] ** state["t"])
+                state["v_t_hat"] = state["v_t"] / (1 - group["betas"][1] ** state["t"])
+                p.data = p.data - alpha * state["m_t_hat"] / (torch.sqrt(state["v_t_hat"]) + group["eps"]) - alpha * group["weight_decay"] * p.data
 
         return loss
