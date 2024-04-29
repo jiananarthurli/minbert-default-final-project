@@ -63,13 +63,13 @@ class AdamW(Optimizer):
                 if "t" not in state:
                     state["t"] = 0
                 if "m_t" not in state:
-                    state["m_t"] = torch.zeros(p.data.shape)
+                    state["m_t"] = torch.zeros(p.data.shape, device=p.device)
                 if "v_t" not in state:
-                    state["v_t"] = torch.zeros(p.data.shape)
+                    state["v_t"] = torch.zeros(p.data.shape, device=p.device)
                 if "m_t_hat" not in state:
-                    state["m_t_hat"] = torch.zeros(p.data.shape)
+                    state["m_t_hat"] = torch.zeros(p.data.shape, device=p.device)
                 if "v_t_hat" not in state:
-                    state["v_t_hat"] = torch.zeros(p.data.shape)
+                    state["v_t_hat"] = torch.zeros(p.data.shape, device=p.device)
                 state["t"] += 1
                 state["m_t"] = group["betas"][0] * state["m_t"] + (1 - group["betas"][0]) * grad
                 state["v_t"] = group["betas"][1] * state["v_t"] + (1 - group["betas"][1]) * torch.pow(grad, 2)
